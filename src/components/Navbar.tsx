@@ -1,44 +1,37 @@
-import { Home, Plus } from "lucide-react";
+import { Home, Plus, ArrowLeft } from "lucide-react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { NewSerpScanModal } from "@/components/modals/NewSerpScanModal";
+import { useRouter } from "@tanstack/react-router";
+import { navbar } from "@/lib/component-styles";
 
 interface NavbarProps {
   showSerpTrackingBreadcrumb?: boolean;
 }
 
 const Navbar = ({ showSerpTrackingBreadcrumb = false }: NavbarProps) => {
-  return (
-    <nav className="w-full bg-navbar-bg px-6 py-4">
-      <div className="flex flex-col space-y-3">
-        {/* First line - Breadcrumbs */}
-        <div className="flex items-center">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/" className="flex items-center gap-1">
-                  <Home className="h-4 w-4" />
-                  Home
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              {showSerpTrackingBreadcrumb && (
-                <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <span className="text-foreground">SERP Tracking</span>
-                  </BreadcrumbItem>
-                </>
-              )}
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+  const router = useRouter();
 
-        {/* Second line - Title and New Scan button */}
-        <div className="flex items-center justify-center w-full">
-          <div className="flex items-center justify-between w-full max-w-[1300px]">
-            <h1 className="text-2xl font-semibold text-foreground">SERP Tracking</h1>
+  return (
+    <nav className={navbar.container}>
+      <div className={navbar.inner}>
+        <div className={navbar.content}>
+          <div className={navbar.wrapper}>
+            {showSerpTrackingBreadcrumb && (
+              <Button
+                variant="ghost"
+                onClick={() => router.navigate({ to: '/' })}
+                className={navbar.backButton}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            )}
+            <div className="flex items-center gap-4">
+              <h1 className={navbar.title}>SERP Tracking</h1>
+            </div>
             <NewSerpScanModal>
-              <Button variant="sky" className="bg-sky-500 text-white border-sky-600 border-[1px]">
+              <Button variant="sky" className={navbar.actionButton}>
                 <Plus className="h-4 w-4 mr-2" />
                 New SERP scan
               </Button>

@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import AddKeywordModal from "@/components/modals/AddKeywordModal";
+import { useToast } from "@/hooks/use-toast";
+import { mockDashboardKeywords, mockChartData, mockSERPData } from "@/mockup/dashboard-keywords";
 import {
   Table,
   TableBody,
@@ -9,18 +12,16 @@ import {
   TableRow
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Tooltip as UITooltip,
   TooltipContent,
@@ -34,9 +35,8 @@ import {
   MapPin,
   Check,
   X,
-  TrendingUp,
-  TrendingDown,
-  ChevronUp
+  ChevronUp,
+  CheckIcon
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
@@ -45,116 +45,22 @@ import trendingUp from "@/assets/trending_up.png";
 
 interface KeywordsTableProps {
   compareMode?: boolean;
+  domainData?: {
+    id: number;
+    domain: string;
+    labels: string[];
+    status: string;
+    lastUpdated: string;
+  } | null;
 }
 
-const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
+const KeywordsTable = ({ compareMode = false, domainData }: KeywordsTableProps) => {
+  const { toast } = useToast();
   const [isAddKeywordOpen, setIsAddKeywordOpen] = useState(false);
-  const [keywords, setKeywords] = useState("");
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [expandedRows, setExpandedRows] = useState<string[]>([]);
 
-  const keywordData = [
-    {
-      id: "1",
-      keyword: "target keyword",
-      url: "info@business-website...",
-      // Nov 1 - Dec 1, 2024
-      bestPosition1: 7,
-      nov1Position: 3,
-      dec1Position: 4,
-      diff1: 4,
-      diffTrend1: "up",
-      aiStatus1: "in",
-      // Jan 1 - Feb 1, 2025
-      bestPosition2: 4,
-      jan1Position: 5,
-      feb1Position: 10,
-      diff2: 5,
-      diffTrend2: "down",
-      aiStatus2: "in",
-      isSelected: false
-    },
-    {
-      id: "2",
-      keyword: "target keyword",
-      url: "info@business-website...",
-      // Nov 1 - Dec 1, 2024
-      bestPosition1: 9,
-      nov1Position: 11,
-      dec1Position: 2,
-      diff1: 2,
-      diffTrend1: "down",
-      aiStatus1: "out",
-      // Jan 1 - Feb 1, 2025
-      bestPosition2: 2,
-      jan1Position: 10,
-      feb1Position: 2,
-      diff2: 8,
-      diffTrend2: "up",
-      aiStatus2: "in",
-      isSelected: true
-    },
-    {
-      id: "3",
-      keyword: "target keyword",
-      url: "info@business-website...",
-      // Nov 1 - Dec 1, 2024
-      bestPosition1: 7,
-      nov1Position: 3,
-      dec1Position: 4,
-      diff1: 4,
-      diffTrend1: "up",
-      aiStatus1: "in",
-      // Jan 1 - Feb 1, 2025
-      bestPosition2: 4,
-      jan1Position: 5,
-      feb1Position: 10,
-      diff2: 5,
-      diffTrend2: "down",
-      aiStatus2: "in",
-      isSelected: false
-    },
-    {
-      id: "4",
-      keyword: "target keyword",
-      url: "info@business-website...",
-      // Nov 1 - Dec 1, 2024
-      bestPosition1: 9,
-      nov1Position: 11,
-      dec1Position: 2,
-      diff1: 2,
-      diffTrend1: "down",
-      aiStatus1: "out",
-      // Jan 1 - Feb 1, 2025
-      bestPosition2: 2,
-      jan1Position: 10,
-      feb1Position: 2,
-      diff2: 8,
-      diffTrend2: "up",
-      aiStatus2: "in",
-      isSelected: true
-    },
-    {
-      id: "5",
-      keyword: "target keyword",
-      url: "info@business-website...",
-      // Nov 1 - Dec 1, 2024
-      bestPosition1: 9,
-      nov1Position: 11,
-      dec1Position: 2,
-      diff1: 2,
-      diffTrend1: "down",
-      aiStatus1: "out",
-      // Jan 1 - Feb 1, 2025
-      bestPosition2: 2,
-      jan1Position: 10,
-      feb1Position: 2,
-      diff2: 8,
-      diffTrend2: "up",
-      aiStatus2: "in",
-      isSelected: true
-    }
-  ];
+  const keywordData = mockDashboardKeywords;
 
   const handleRowSelect = (id: string, checked: boolean) => {
     if (checked) {
@@ -180,45 +86,39 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
     }
   };
 
-  const handleAddKeywords = () => {
+  const handleAddKeywords = (keywords: string) => {
     console.log("Adding keywords:", keywords);
-    setKeywords("");
-    setIsAddKeywordOpen(false);
-  };
-
-  const clearKeywords = () => {
-    setKeywords("");
+    // Handle keywords logic here
   };
 
   const AIOverviewTooltip = () => (
     <div className="bg-white p-3 max-w-xs">
-      <div className="space-y-2">
+      <div className="space-y-6 flex flex-col justify-center items-start">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="text-sm font-medium">Appears in AI:</span>
+          <span className="text-sm text-foreground">Appears in AI:</span>
+          <div className="w-4 h-4 border-green-500 border-[2px] rounded-full">
+            <CheckIcon className="w-full h-full text-green-500" />
+          </div>
         </div>
-        <div className="text-sm text-gray-600">AI model: ChatGPT</div>
-        <div className="text-sm text-gray-600">
-          <strong>AI Overview snippet:</strong>
-        </div>
-        <div className="text-sm text-gray-600 italic">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore...
+        <div className="text-sm text-foreground">AI model: ChatGPT</div>
+        <div className="text-sm text-foreground flex flex-col items-start gap-2">
+          AI Overview snippet:
+          <span className="text-sm text-foreground pl-1 font-normal text-start">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore...
+          </span>
         </div>
       </div>
     </div>
   );
 
   const AveragePositionTooltip = () => (
-    <div className="bg-white p-3 max-w-xs">
-      <div className="space-y-2">
-        <div>
-          <strong className="text-sm">Best</strong>
-          <span className="text-sm text-gray-600"> - your best average Google Maps rank within the selected date range</span>
-        </div>
-        <div>
-          <strong className="text-sm">Difference</strong>
-          <span className="text-sm text-gray-600"> - measures the change in average rank over the selected time period</span>
-        </div>
+    <div className="bg-white p-3 max-w-xs text-left">
+      <div className="font-normal text-start">
+        <span className="font-semibold">Average Position</span><br/><br/>
+        <span className="font-semibold">Best</span> - your best average Google Maps<br/>
+        rank within the selected date range<br/><br/>
+        <span className="font-semibold">Difference</span> - measures the change in<br/>
+        average rank over the selected time period
       </div>
     </div>
   );
@@ -241,13 +141,14 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
 
   const DetailedAnalysis = ({ rowId }: { rowId: string }) => (
     <TableRow>
-      <TableCell colSpan={14} className="p-0 w-full">
-        <div className="p-6 border-t w-full">
+      <TableCell colSpan={compareMode ? 13 : 8} className="p-0">
+        <div className="p-6 border-t w-full bg-blue-50">
           {/* Recent Check Details */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Recent Check Details</h3>
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+            <h3 className="text-xl font-semibold mb-8">Recent Check Details</h3>
+            <div className="flex items-center text-md justify-between gap-4 mb-4">
+              <div className="flex flex-col items-start justify-center gap-2 text-sm text-gray-600">
+                <span className="mb-2">Date</span>
                 <span className="flex gap-2">
                   <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_7426_117354)">
@@ -270,8 +171,9 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                   Feb 15, 2025 | 03:20 PM
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="flex">
+              <div className="flex flex-col items-start justify-center gap-2 text-sm mb-4">
+                <span className="mb-2">URL</span>
+                <span className="flex gap-2">
                   <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_7426_117374)">
                       <path d="M10 18C14.1421 18 17.5 14.6421 17.5 10.5C17.5 6.35786 14.1421 3 10 3C5.85786 3 2.5 6.35786 2.5 10.5C2.5 14.6421 5.85786 18 10 18Z" stroke="#6B7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
@@ -285,61 +187,41 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                       </clipPath>
                     </defs>
                   </svg>
-
-                  publicserviceplumbers.com/plumbing
+                  <span className="text-sky-600 underline">publicserviceplumbers.com/plumbing</span>
                 </span>
               </div>
-              <div className="text-sm">
-                <span className="font-medium">Position:</span> 9
+              <div className="text-sm flex flex-col justify-center items-start">
+                <span className="mb-2">Position</span>
+                <span className="font-normal"> 9</span>
               </div>
-              <Button variant="outline" size="sm" className="text-sm">
+              <Button variant="outline" size="sm" className="text-sm font-normal bg-[#DDE8F7] border-[#6999DC] border-[1px] hover:bg-[#B9CFEF] text-[#1E1F20]">
                 View SERP →
               </Button>
             </div>
           </div>
 
           {/* Keyword Position Chart */}
-          <div className="mb-6">
-            <h4 className="text-md font-medium mb-4">Keyword Position</h4>
-            <div className="bg-white border rounded-lg p-4 h-80 relative">
-              <ResponsiveContainer width="100%" height="100%">
+          <div className="mb-10">
+
+            <div className="bg-white border rounded-lg p-4 h-96 relative">
+              <h4 className="text-md font-medium mb-4">Keyword Position</h4>
+              <ResponsiveContainer width="100%" height="85%">
                 <LineChart
-                  data={[
-                    { date: 'Nov 1', current: 45, previous: 55, label: 'Nov 1, 2024' },
-                    { date: 'Nov 5', current: 42, previous: 52, label: 'Nov 5, 2024' },
-                    { date: 'Nov 10', current: 70, previous: 62, label: 'Nov 10, 2024' },
-                    { date: 'Nov 15', current: 35, previous: 45, label: 'Nov 15, 2024' },
-                    { date: 'Nov 20', current: 45, previous: 50, label: 'Nov 20, 2024' },
-                    { date: 'Nov 25', current: 40, previous: 48, label: 'Nov 25, 2024' },
-                    { date: 'Dec 1', current: 50, previous: 55, label: 'Dec 1, 2024' },
-                    { date: 'Dec 5', current: 38, previous: 45, label: 'Dec 5, 2024' },
-                    { date: 'Dec 10', current: 42, previous: 50, label: 'Dec 10, 2024' },
-                    { date: 'Dec 15', current: 35, previous: 40, label: 'Dec 15, 2024' },
-                    { date: 'Dec 20', current: 48, previous: 52, label: 'Dec 20, 2024' },
-                    { date: 'Dec 25', current: 40, previous: 45, label: 'Dec 25, 2024' },
-                    { date: 'Jan 1', current: 45, previous: 50, label: 'Jan 1, 2025' },
-                    { date: 'Jan 5', current: 38, previous: 42, label: 'Jan 5, 2025' },
-                    { date: 'Jan 10', current: 35, previous: 38, label: 'Jan 10, 2025' },
-                    { date: 'Jan 15', current: 33, previous: 35, label: 'Jan 15, 2025' },
-                    { date: 'Jan 20', current: 40, previous: 42, label: 'Jan 20, 2025' },
-                    { date: 'Jan 25', current: 45, previous: 48, label: 'Jan 25, 2025' },
-                    { date: 'Jan 30', current: 50, previous: 52, label: 'Jan 30, 2025' },
-                    { date: 'Feb 1', current: 48, previous: 50, label: 'Feb 1, 2025' }
-                  ]}
+                  data={mockChartData}
                   margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                 >
                   <XAxis
                     dataKey="date"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#9ca3af' }}
+                    axisLine={true}
+                    tickLine={compareMode ? false: true}
+                    tick={{ fontSize: compareMode ? 0 : 12, fill: '#9ca3af', textAnchor: 'middle' }}
                     interval="preserveStartEnd"
                   />
                   <YAxis
                     domain={[1, 80]}
                     reversed={true}
-                    axisLine={false}
-                    tickLine={false}
+                    axisLine={true}
+                    tickLine={true}
                     tick={{ fontSize: 12, fill: '#9ca3af' }}
                     tickFormatter={(value) => value.toString()}
                   />
@@ -370,7 +252,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         dataKey="current"
                         stroke="#3b82f6"
                         strokeWidth={2}
-                        dot={{ fill: '#3b82f6', strokeWidth: 0, r: 4 }}
+                        dot={false}
                         activeDot={{ r: 6, fill: '#3b82f6' }}
                       />
                       <Line
@@ -378,7 +260,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         dataKey="previous"
                         stroke="#94a3b8"
                         strokeWidth={2}
-                        dot={{ fill: '#94a3b8', strokeWidth: 0, r: 4 }}
+                        dot={false}
                         activeDot={{ r: 6, fill: '#94a3b8' }}
                       />
                     </>
@@ -388,13 +270,13 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                       dataKey="current"
                       stroke="#3b82f6"
                       strokeWidth={2}
-                      dot={{ fill: '#3b82f6', strokeWidth: 0, r: 4 }}
+                      dot={false}
                       activeDot={{ r: 6, fill: '#3b82f6' }}
                     />
                   )}
                 </LineChart>
               </ResponsiveContainer>
-              <div className="absolute bottom-4 left-4 text-xs text-gray-500">
+              <div className="absolute bottom-4 left-4 text-xs text-gray-500 w-full flex justify-center">
                 {compareMode ? (
                   <>
                     <span className="mr-4">Nov 1 - Dec 1, 2024</span>
@@ -410,20 +292,9 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
 
           {/* Top 10 SERPs */}
           <div>
-            <h4 className="text-md font-medium mb-4">Top 10 SERP's</h4>
+            <h4 className="text-md font-medium mb-4 h-8 border-b-2 w-3/4">Top 10 SERP's</h4>
             <div className="space-y-2">
-              {[
-                "https://isleys.com/plumbing/repair/",
-                "https://www.yelp.com/search?find_desc=Emergency+Plumber&find_loc=Gilbert%2C+AZ",
-                "https://www.cureallplumbing.com/24-hr-emergency-plumber",
-                "https://www.emergencyplumbingexpert.com/gilbert-az",
-                "https://iriverlandscorplumbing.com/plumbers-gilbert-az/",
-                "https://www.rotorooter.com/plumbing/emergency-plumber/",
-                "https://www.plumbingmedic.net/plumbing/emergency-repairs",
-                "https://www.angi.com/near-me/emergency-plumber/",
-                "https://publicserviceplumbers.com/plumbing",
-                "https://groundscorplumbingco.com/plumbing/gilbert/"
-              ].map((url, index) => (
+              {mockSERPData.urls.map((url, index) => (
                 <div key={index} className="flex items-center gap-3 text-sm">
                   <span className="text-gray-500 w-6">{index + 1}.</span>
                   <a href="#" className="text-blue-500 hover:underline flex-1">
@@ -440,8 +311,13 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
 
   return (
     <TooltipProvider>
+      <AddKeywordModal 
+        open={isAddKeywordOpen}
+        onClose={() => setIsAddKeywordOpen(false)}
+        onConfirm={handleAddKeywords}
+      />
       <div className="mt-8">
-        <div className="flex justify-between mb-4">
+        <div className="flex justify-between bg-white p-4">
           {/* Actions Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -450,135 +326,97 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="bg-white z-50">
-              <DropdownMenuItem>Rerun</DropdownMenuItem>
-              <DropdownMenuItem>Export as PDF</DropdownMenuItem>
-              <DropdownMenuItem>Export as CSV</DropdownMenuItem>
+            <DropdownMenuContent align="start" className="bg-white z-[100]">
+              <DropdownMenuItem onClick={() => toast({title: "Refreshing...", description: "Data is being refreshed."})}>Rerun</DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => {
+                try {
+                  const { exportToPDF } = await import("@/lib/exportUtils");
+                  await exportToPDF();
+                  toast({title: "PDF exported!", description: "Your PDF export has been generated successfully."});
+                } catch (err) {
+                  toast({title: "Export failed", description: "Could not generate PDF export.", variant: "destructive"});
+                }
+              }}>Export as PDF</DropdownMenuItem>
+              <DropdownMenuItem onClick={async () => {
+                try {
+                  const { exportToCSV } = await import("@/lib/exportUtils");
+                  await exportToCSV();
+                  toast({title: "CSV exported!", description: "Your CSV export has been generated successfully."});
+                } catch (err) {
+                  toast({title: "Export failed", description: "Could not generate CSV export.", variant: "destructive"});
+                }
+              }}>Export as CSV</DropdownMenuItem>
               <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           {/* Add Keyword Button */}
-          <Dialog open={isAddKeywordOpen} onOpenChange={setIsAddKeywordOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2 bg-sky-500 border-sky-600 border-[1px] text-white hover:bg-sky-blue hover:text-gray-50">
-                <Plus className="h-4 w-4" />
-                Add keyword
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md bg-white">
-              <DialogHeader>
-                <DialogTitle>Add keywords</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-sm text-gray-600">Keywords (6)</label>
-                    <button
-                      onClick={clearKeywords}
-                      className="text-sm text-blue-500 hover:text-blue-700"
-                    >
-                      Clear all
-                    </button>
-                  </div>
-                  <textarea
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
-                    placeholder="1.&#10;2.&#10;3.&#10;4.&#10;5.&#10;6."
-                    className="w-full h-32 p-3 border border-gray-300 rounded-md resize-none text-sm"
-                  />
-                  <p className="text-sm text-gray-500 mt-2">*Enter keywords one per line</p>
-                </div>
-                <div className="flex justify-end">
-                  <Button
-                    onClick={handleAddKeywords}
-                    className="bg-blue-500 hover:bg-blue-600 text-white"
-                  >
-                    Add keyword
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            onClick={() => setIsAddKeywordOpen(true)}
+            className="gap-2 bg-[#DDE8F7] border-[#6999DC] border-[1.1px] text-foreground hover:bg-[#DDE8F7CC] hover:text-sky-800"
+          >
+            <Plus className="h-4 w-4" />
+            Add keyword
+          </Button>
         </div>
 
         {/* Keywords Table */}
-        <div className="bg-blue-50 rounded-lg">
-          <Table>
-            <TableHeader>
+        <div className="rounded-lg" style={{ border: '1.3px solid #d1d5db' }} data-compare-mode={compareMode.toString()}>
+          <Table className="rounded-lg overflow-hidden">
+            <TableHeader className="bg-[#D6E8FF]">
               {/* First header row */}
-              <TableRow className="border-b">
-                <TableHead className="w-12">
+              <TableRow className="hover:bg-inherit">
+                <TableHead className="w-12" rowSpan={2}>
                   <Checkbox
                     checked={selectedRows.length === keywordData.length}
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead>Keyword ({selectedRows.length > 0 ? `${selectedRows.length} selected` : keywordData.length})</TableHead>
-                <TableHead>Found in URL</TableHead>
-                {compareMode ? (
-                  <>
-                    <TableHead colSpan={5} className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        Average Position
-                        <UITooltip>
-                          <TooltipTrigger>
-                            <Info className="h-4 w-4 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <AveragePositionTooltip />
-                          </TooltipContent>
-                        </UITooltip>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">(Nov 1 - Dec 1, 2024)</div>
-                    </TableHead>
-                    <TableHead colSpan={5} className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        Average Position
-                        <UITooltip>
-                          <TooltipTrigger>
-                            <Info className="h-4 w-4 text-gray-400" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <AveragePositionTooltip />
-                          </TooltipContent>
-                        </UITooltip>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">(Jan 1 - Feb 1, 2025)</div>
-                    </TableHead>
-                  </>
-                ) : (
-                  <TableHead colSpan={5} className="text-center">
+                <TableHead rowSpan={2} className="text-black font-medium">Keyword ({selectedRows.length})</TableHead>
+                <TableHead rowSpan={2} className="text-black font-medium"><div className="flex items-center justify-start">Found in URL</div></TableHead>
+                <TableHead colSpan={5} className="text-center text-black font-medium">
+                  <div className="flex items-center justify-center gap-1">
+                    Average Position
+                    <UITooltip>
+                      <TooltipTrigger>
+                        <Info className="h-4 w-4 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent align="start">
+                        <AveragePositionTooltip />
+                      </TooltipContent>
+                    </UITooltip>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">(Nov 1 - Dec 1, 2024)</div>
+                </TableHead>
+                {compareMode && (
+                  <TableHead colSpan={5} className="text-center text-black font-medium">
                     <div className="flex items-center justify-center gap-1">
                       Average Position
                       <UITooltip>
                         <TooltipTrigger>
                           <Info className="h-4 w-4 text-gray-400" />
                         </TooltipTrigger>
-                        <TooltipContent>
+                        <TooltipContent align="start">
                           <AveragePositionTooltip />
                         </TooltipContent>
                       </UITooltip>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">(Nov 1 - Dec 1, 2024)</div>
-                  </TableHead>
-                )}
-                <TableHead></TableHead>
+                     <div className="text-xs text-gray-500 mt-1">(Jan 1 - Feb 1, 2025)</div>
+                   </TableHead>
+                 )}
+                
               </TableRow>
 
               {/* Second header row */}
-              <TableRow>
-                <TableHead></TableHead>
-                <TableHead></TableHead>
-                <TableHead></TableHead>
+              <TableRow className="hover:bg-inherit">
                 <TableHead className="text-center">
                   <UITooltip>
                     <TooltipTrigger>
                       <span className="text-xs">Best</span>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="text-sm">Best average position in selected date range — lower is better.</div>
-                    </TooltipContent>
+                      <TooltipContent align="start">
+                        <div className="text-[13px] max-w-[168px] font-normal text-left">Best average position in selected date range — lower is better.</div>
+                      </TooltipContent>
                   </UITooltip>
                 </TableHead>
                 <TableHead className="text-center">
@@ -587,7 +425,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                       <span className="text-xs">Nov 1</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <div className="text-sm">Start date</div>
+                      <div className="text-[13px] max-w-[168px] font-normal">Start date</div>
                     </TooltipContent>
                   </UITooltip>
                 </TableHead>
@@ -597,7 +435,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                       <span className="text-xs">Dec 1</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <div className="text-sm">End date</div>
+                      <div className="text-[13px] max-w-[168px] font-normal">End date</div>
                     </TooltipContent>
                   </UITooltip>
                 </TableHead>
@@ -606,9 +444,9 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                     <TooltipTrigger>
                       <span className="text-xs">Diff</span>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <div className="text-sm">Difference of average positions from start to end of date range.</div>
-                    </TooltipContent>
+                      <TooltipContent align="start">
+                        <div className="text-[13px] max-w-[168px] font-normal text-left">Difference of average positions from start to end of date range.</div>
+                      </TooltipContent>
                   </UITooltip>
                 </TableHead>
                 <TableHead className="text-center">
@@ -631,9 +469,9 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         A.I.
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      <AIOverviewTooltip />
-                    </TooltipContent>
+                      <TooltipContent align="start">
+                        <AIOverviewTooltip />
+                      </TooltipContent>
                   </UITooltip>
                 </TableHead>
                 {compareMode && (<>
@@ -643,7 +481,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         <span className="text-xs">Best</span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <div className="text-sm">Best average position in selected date range — lower is better.</div>
+                        <div className="text-[13px] max-w-[168px] font-normal text-left">Best average position in selected date range — lower is better.</div>
                       </TooltipContent>
                     </UITooltip>
                   </TableHead>
@@ -653,7 +491,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         <span className="text-xs">Jan 1</span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <div className="text-sm">Start date</div>
+                        <div className="text-[13px] max-w-[168px] font-normal">Start date</div>
                       </TooltipContent>
                     </UITooltip>
                   </TableHead>
@@ -663,7 +501,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         <span className="text-xs">Feb 1</span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <div className="text-sm">End date</div>
+                        <div className="text-[13px] max-w-[168px] font-normal">End date</div>
                       </TooltipContent>
                     </UITooltip>
                   </TableHead>
@@ -673,7 +511,7 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         <span className="text-xs">Diff</span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <div className="text-sm">Difference of average positions from start to end of date range.</div>
+                        <div className="text-[13px] max-w-[168px] font-normal text-left">Difference of average positions from start to end of date range.</div>
                       </TooltipContent>
                     </UITooltip>
                   </TableHead>
@@ -708,14 +546,28 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
             <TableBody>
               {keywordData.map((row) => (
                 <React.Fragment key={row.id}>
-                  <TableRow className={row.isSelected ? "bg-blue-100" : ""}>
-                    <TableCell>
+                  <TableRow className={selectedRows.includes(row.id) || expandedRows.includes(row.id) ? "bg-sky-50 h-16" : "h-16"}>
+                    <TableCell className="w-12">
                       <Checkbox
                         checked={selectedRows.includes(row.id)}
                         onCheckedChange={(checked) => handleRowSelect(row.id, checked as boolean)}
                       />
                     </TableCell>
-                    <TableCell className="font-medium w-1/6">{row.keyword}</TableCell>
+                    <TableCell className="font-medium w-1/6">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleRowExpansion(row.id)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          {expandedRows.includes(row.id) ? (
+                            <ChevronUp className="h-4 w-4" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4" />
+                          )}
+                        </button>
+                        {row.keyword}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <a href="#" className="text-blue-500 hover:underline">
                         {row.url}
@@ -827,24 +679,6 @@ const KeywordsTable = ({ compareMode = false }: KeywordsTableProps) => {
                         </TableCell>
                       </>
                     )}
-
-                    {/* See details / Hide details button */}
-                    <TableCell className="text-center">
-                      <button
-                        onClick={() => toggleRowExpansion(row.id)}
-                        className="text-blue-500 hover:text-blue-700 text-sm w-[92px] flex justify-end items-center gap-1 mx-auto"
-                      >
-                        {expandedRows.includes(row.id) ? (
-                          <>
-                            hide details <ChevronUp className="h-4 w-4" />
-                          </>
-                        ) : (
-                          <>
-                            see details <ChevronDown className="h-4 w-4" />
-                          </>
-                        )}
-                      </button>
-                    </TableCell>
                   </TableRow>
 
                   {/* Expanded details row */}

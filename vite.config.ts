@@ -19,4 +19,8 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Add this for TanStack Router
+  optimizeDeps: {
+    include: ['@tanstack/react-router']
+  }
 }));
