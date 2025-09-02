@@ -31,27 +31,27 @@ const FilterBadges = ({
       
 
       {/* Status Filter Badges */}
-      <div className="flex items-center justify-between py-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-end py-4">
+        {/* <div className="flex items-center gap-3">
           <Badge 
             variant="outline" 
-            className="px-4 py-2 bg-white text-sky-600 border-primary rounded-full"
+            className="px-4 py-2 bg-white text-sky-600 text-[15px] font-normal border-primary rounded-full"
           >
-            All <span className="ml-1 font-normal text-sky-600 bg-sky-200  py-[1px] px-[4px] rounded-[4px]">90</span>
+            All <span className="ml-1 font-normal text-sky-600 bg-sky-100 text-[12px] py-[1px] px-[4px] rounded-[4px]">90</span>
           </Badge>
           <Badge 
             variant="outline" 
-            className="px-4 py-2 bg-background text-muted-foreground border-border-grey rounded-full hover:bg-accent"
+            className="px-4 py-2 bg-background text-muted-foreground text-[15px] font-normal border-border-grey rounded-full hover:bg-accent"
           >
-            Active <span className="ml-1 font-normal text-gray-600 bg-gray-300  py-[1px] px-[4px] rounded-[4px]">60</span>
+            Active <span className="ml-1 font-normal text-gray-600 bg-gray-300 text-[12px] py-[1px] px-[4px] rounded-[4px]">60</span>
           </Badge>
           <Badge 
             variant="outline" 
-            className="px-4 py-2 bg-background text-muted-foreground border-border-grey rounded-full hover:bg-accent"
+            className="px-4 py-2 bg-background text-muted-foreground text-[15px] font-normal border-border-grey rounded-full hover:bg-accent"
           >
-            Paused <span className="ml-1 font-normal text-gray-600 bg-gray-300  py-[1px] px-[4px] rounded-[4px]">30</span>
+            Paused <span className="ml-1 font-normal text-gray-600 bg-gray-300 text-[12px] py-[1px] px-[4px] rounded-[4px]">30</span>
           </Badge>
-        </div>
+        </div> */}
 
         {/* Pagination Info and Controls */}
         <div className="flex items-center gap-4">

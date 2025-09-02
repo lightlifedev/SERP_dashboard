@@ -16,6 +16,25 @@ interface ProcessingModalProps {
 }
 
 const ProcessingModal = ({ open, onClose, title = "Processing scans..." }: ProcessingModalProps) => {
+  const [progress, setProgress] = React.useState(0);
+
+  React.useEffect(() => {
+    if (open) {
+      setProgress(0);
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 95) {
+            clearInterval(interval);
+            return 95;
+          }
+          return prev + Math.random() * 15;
+        });
+      }, 200);
+
+      return () => clearInterval(interval);
+    }
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg bg-white rounded-lg border-0 shadow-xl">
@@ -31,7 +50,10 @@ const ProcessingModal = ({ open, onClose, title = "Processing scans..." }: Proce
           </p>
           
           <div className="space-y-4">
-            <Progress value={65} className="w-full h-3" />
+            <Progress value={progress} className="w-full h-3" />
+            <div className="text-center text-sm text-gray-500">
+              {Math.round(progress)}% complete
+            </div>
           </div>
           
           <div className="flex justify-center">

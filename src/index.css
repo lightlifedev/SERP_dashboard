@@ -1,3 +1,4 @@
+@import './styles/base.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,6 +35,7 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
+    --input-focus: 218 49% 65%;
     --ring: 222.2 84% 4.9%;
 
     /* SERP Tracking Design System */
@@ -44,6 +46,35 @@ All colors MUST be HSL.
     --dark-blue: 212 72% 21%;
     --weak-blue: 212 100% 97%;
     --border-grey: 210 11% 90%;
+    
+    /* Enhanced Design System Colors */
+    --primary-50: 212 100% 97%;
+    --primary-100: 212 100% 94%;
+    --primary-600: 212 100% 45%;
+    --primary-700: 212 100% 40%;
+    --primary-900: 212 100% 25%;
+    
+    --sky-50: 200 100% 97%;
+    --sky-100: 200 100% 94%;
+    --sky-500: 200 100% 70%;
+    --sky-600: 200 100% 65%;
+    --sky-700: 200 100% 60%;
+    
+    --neutral-50: 210 11% 98%;
+    --neutral-100: 210 11% 96%;
+    --neutral-200: 210 11% 90%;
+    --neutral-300: 210 11% 85%;
+    --neutral-400: 210 11% 75%;
+    --neutral-500: 210 11% 65%;
+    --neutral-600: 210 11% 55%;
+    --neutral-700: 210 11% 45%;
+    --neutral-800: 210 11% 35%;
+    --neutral-900: 210 11% 25%;
+    
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --info: 212 100% 50%;
 
     --radius: 0.5rem;
 
@@ -91,6 +122,7 @@ All colors MUST be HSL.
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
+    --input-focus: 218 49% 65%;
     --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -109,6 +141,6 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-poppins;
   }
 }

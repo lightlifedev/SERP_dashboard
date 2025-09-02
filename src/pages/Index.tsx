@@ -8,12 +8,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
       <div className="bg-white">
         <div className="max-w-[1300px] mx-auto px-6 mb-8">
           <SerpScansHeader />
           <FilterBadges />
-          <SearchFilters />
+          <div className="sticky top-0 z-[10] bg-white">
+            <SearchFilters />
+          </div>
           <KeywordsTable />
         </div>
       </div>
