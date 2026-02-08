@@ -100,8 +100,8 @@ The app currently runs without required env vars and can use mock data.
 
 ## 🖼 Screenshots
 
-![Dashboard Main View](https://raw.githubusercontent.com/lightlifedev/SERP_dashboard/main/public/screenshot1.png)
-![Detailed Analytics](https://raw.githubusercontent.com/lightlifedev/SERP_dashboard/main/public/screenshot2.png)
+![Dashboard Main View](https://raw.githubusercontent.com/lightlifedev/SERP_dashboard/refs/heads/main/public/screenshot1.png)
+![Detailed Analytics](https://raw.githubusercontent.com/lightlifedev/SERP_dashboard/refs/heads/main/public/screenshot2.png)
 
 
 <!-- ![Dashboard overview](docs/screenshot-dashboard.png) -->
