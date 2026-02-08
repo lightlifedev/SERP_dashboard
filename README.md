@@ -73,7 +73,7 @@ npm run dev
 
 Then open your browser and go to:
 
-👉 [http://localhost:5173](http://localhost:5173)
+👉 [http://localhost:8080](http://localhost:8080)
 
 **Other scripts:**
 
